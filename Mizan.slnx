@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Mizan.Api/Mizan.Api.csproj" />
+    <Project Path="src/Mizan.Application/Mizan.Application.csproj" />
+    <Project Path="src/Mizan.Contracts/Mizan.Contracts.csproj" />
+    <Project Path="src/Mizan.Domain/Mizan.Domain.csproj" />
+    <Project Path="src/Mizan.Infrastructure/Mizan.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Mizan.IntegrationTests/Mizan.IntegrationTests.csproj" />
+    <Project Path="tests/Mizan.UnitTests/Mizan.UnitTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,35 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# Secrets & Environment
+*.env
+*.env.*
+appsettings.Production.json
+firebase-adminsdk*.json
+service-account*.json
+*.pfx
+*.p12
+*.jks
+*.keystore
+keystore.properties
+*.publishsettings
+
+# OS files
+.DS_Store
+Thumbs.db

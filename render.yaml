@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: mizan-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: AI__Provider
+        value: Gemini
+      - key: Firebase__ProjectId
+        value: mizan-finance-sa
+      - key: Notification__Enabled
+        value: "true"
+      - key: AUTO_MIGRATE
+        value: "true"
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: AI__ApiKey
+        sync: false
+      - key: Jobs__InternalSecret
+        sync: false
