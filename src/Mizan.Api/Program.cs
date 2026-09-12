@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.IdentityModel.Tokens;
 using Mizan.Api.Middleware;
 using Mizan.Application.Interfaces;
@@ -209,6 +211,11 @@ using (var scope = app.Services.CreateScope())
         {
             app.Logger.LogInformation("AUTO_MIGRATE active: Ensuring database schema exists...");
             db.Database.EnsureCreated();
+            var creator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+            if (creator != null)
+            {
+                try { creator.CreateTables(); } catch { /* Tables already exist */ }
+            }
         }
         catch (Exception ex)
         {
