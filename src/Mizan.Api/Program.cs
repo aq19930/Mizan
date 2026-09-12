@@ -133,7 +133,11 @@ else
 }
 
 // Authentication & JWT
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "MizanSecretSuperKeyForJwtSigning_2026_SaudiArabia_SecureToken12345!";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    jwtKey = "MizanSecretSuperKeyForJwtSigning_2026_SaudiArabia_SecureToken12345!";
+}
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -222,10 +226,13 @@ _ = Task.Run(async () =>
             {
                 app.Logger.LogInformation("AUTO_MIGRATE active: Ensuring database schema exists...");
                 await db.Database.EnsureCreatedAsync();
-                var creator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
-                if (creator != null)
+                if (db.Database.IsRelational())
                 {
-                    try { await creator.CreateTablesAsync(); } catch { /* Tables already exist */ }
+                    var creator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                    if (creator != null)
+                    {
+                        try { await creator.CreateTablesAsync(); } catch { /* Tables already exist */ }
+                    }
                 }
             }
             catch (Exception ex)
@@ -2398,12 +2405,17 @@ app.MapPost("/api/notifications/fcm-token", async (
 }).RequireAuthorization();
 
 app.MapDelete("/api/notifications/fcm-token", async (
-    DeactivateFcmTokenRequest req,
+    [AsParameters] DeactivateFcmTokenRequest req,
     ClaimsPrincipal principal,
     MizanDbContext db) =>
 {
     var userId = GetUserId(principal);
     if (userId == null) return Results.Unauthorized();
+
+    if (string.IsNullOrWhiteSpace(req.Token))
+    {
+        return Results.BadRequest(new { error = "Token is required." });
+    }
 
     var existing = await db.UserDeviceTokens
         .FirstOrDefaultAsync(t => t.UserId == userId.Value && t.Token == req.Token);
