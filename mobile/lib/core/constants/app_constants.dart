@@ -1,4 +1,4 @@
-﻿class AppConstants {
+class AppConstants {
   AppConstants._();
 
   // App Metadata
@@ -14,7 +14,7 @@
   static const String symbol = 'assets/images/mizan_symbol.png';
 
   // API Config
-  static const String defaultBaseUrl = 'https://api.mizan.app/api';
+  static const String defaultBaseUrl = 'https://mizan-5w30.onrender.com/api';
   static const Duration connectTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 15);
 

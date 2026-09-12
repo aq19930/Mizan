@@ -28,8 +28,8 @@ class ApiConfig {
   /// Development Base URL (Android Emulator to local ASP.NET Core)
   static const String devBaseUrl = 'http://10.0.2.2:5125/api';
 
-  /// Production Base URL (Google Cloud Run HTTPS)
-  static const String prodBaseUrl = 'https://mizan-api-production.run.app/api';
+  /// Production Base URL (Render Cloud API)
+  static const String prodBaseUrl = 'https://mizan-5w30.onrender.com/api';
 
   /// Returns the active API base URL
   static String get baseUrl {
