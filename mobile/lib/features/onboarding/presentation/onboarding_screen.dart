@@ -1,10 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/language_switcher.dart';
 import '../../../shared/widgets/mizan_button.dart';
+import '../../../shared/widgets/mizan_animated_entrance.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -188,75 +190,57 @@ class _IllustrationWallet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      height: 220,
-      decoration: BoxDecoration(
-        color: AppColors.primaryDeepGreen.withValues(alpha: 0.08),
-        shape: BoxShape.circle,
-      ),
-      child: Stack(
+    return MizanPulseEffect(
+      duration: const Duration(milliseconds: 2400),
+      minScale: 0.95,
+      maxScale: 1.04,
+      child: Container(
+        width: 220,
+        height: 220,
+        decoration: BoxDecoration(
+          color: AppColors.primaryDeepGreen.withValues(alpha: 0.08),
+          shape: BoxShape.circle,
+        ),
         alignment: Alignment.center,
-        children: [
-          Container(
-            width: 150,
-            height: 100,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primaryDeepGreen, Color(0xFF1B6B52)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Hero(
+              tag: 'app_logo_icon',
+              child: Container(
+                width: 128,
+                height: 128,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryDeepGreen.withValues(alpha: 0.35),
+                      blurRadius: 28,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(28),
+                  child: Image.asset(
+                    AppConstants.appIcon,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
-              borderRadius: BorderRadius.circular(18),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryDeepGreen.withValues(alpha: 0.3),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
             ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 14,
-                  left: 16,
-                  child: Container(
-                    width: 30,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondarySageGreen.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 14,
-                  right: 16,
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accentBrightGreen,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.attach_money, size: 16, color: Colors.white),
-                  ),
-                ),
-              ],
+            const Positioned(
+              top: 18,
+              right: 18,
+              child: _MiniBadge(icon: Icons.trending_up, color: AppColors.accentBrightGreen),
             ),
-          ),
-          const Positioned(
-            top: 28,
-            right: 32,
-            child: _MiniBadge(icon: Icons.trending_up, color: AppColors.accentBrightGreen),
-          ),
-          const Positioned(
-            bottom: 30,
-            left: 28,
-            child: _MiniBadge(icon: Icons.pie_chart, color: AppColors.secondarySageGreen),
-          ),
-        ],
+            const Positioned(
+              bottom: 20,
+              left: 18,
+              child: _MiniBadge(icon: Icons.pie_chart, color: AppColors.secondarySageGreen),
+            ),
+          ],
+        ),
       ),
     );
   }

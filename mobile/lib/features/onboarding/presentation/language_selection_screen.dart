@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/mizan_button.dart';
 import '../../../shared/widgets/mizan_card.dart';
 import '../../../shared/widgets/mizan_logo.dart';
+import '../../../shared/widgets/mizan_animated_entrance.dart';
 
 class LanguageSelectionScreen extends ConsumerWidget {
   const LanguageSelectionScreen({super.key});
@@ -25,50 +26,68 @@ class LanguageSelectionScreen extends ConsumerWidget {
           child: Column(
             children: [
               const Spacer(flex: 1),
-              const MizanLogo(size: 68),
+              const MizanAnimatedEntrance(
+                duration: Duration(milliseconds: 700),
+                child: MizanLogo(size: 84, useIconOnly: true, heroTag: 'app_logo_icon'),
+              ),
               const SizedBox(height: 24),
-              Text(
-                l10n.chooseLanguageTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                textAlign: TextAlign.center,
+              MizanAnimatedEntrance(
+                delay: const Duration(milliseconds: 100),
+                child: Text(
+                  l10n.chooseLanguageTitle,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
               ),
               const SizedBox(height: 8),
-              Text(
-                l10n.chooseLanguageSubtitle,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
-                    ),
-                textAlign: TextAlign.center,
+              MizanAnimatedEntrance(
+                delay: const Duration(milliseconds: 180),
+                child: Text(
+                  l10n.chooseLanguageSubtitle,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
               ),
               const SizedBox(height: 40),
-              _LanguageOptionCard(
-                title: 'العربية',
-                subtitle: 'Arabic (RTL)',
-                isSelected: currentLocale.languageCode == 'ar',
-                onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
-                },
+              MizanAnimatedEntrance(
+                delay: const Duration(milliseconds: 260),
+                child: _LanguageOptionCard(
+                  title: 'العربية',
+                  subtitle: 'Arabic (RTL)',
+                  isSelected: currentLocale.languageCode == 'ar',
+                  onTap: () {
+                    ref.read(localeProvider.notifier).setLocale(const Locale('ar'));
+                  },
+                ),
               ),
               const SizedBox(height: 16),
-              _LanguageOptionCard(
-                title: 'English',
-                subtitle: 'الإنجليزية (LTR)',
-                isSelected: currentLocale.languageCode == 'en',
-                onTap: () {
-                  ref.read(localeProvider.notifier).setLocale(const Locale('en'));
-                },
+              MizanAnimatedEntrance(
+                delay: const Duration(milliseconds: 340),
+                child: _LanguageOptionCard(
+                  title: 'English',
+                  subtitle: 'الإنجليزية (LTR)',
+                  isSelected: currentLocale.languageCode == 'en',
+                  onTap: () {
+                    ref.read(localeProvider.notifier).setLocale(const Locale('en'));
+                  },
+                ),
               ),
               const Spacer(flex: 2),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: MizanButton(
-                  text: l10n.continueText,
-                  onPressed: () {
-                    context.go(AppRoutes.onboarding);
-                  },
+              MizanAnimatedEntrance(
+                delay: const Duration(milliseconds: 420),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: MizanButton(
+                    text: l10n.continueText,
+                    onPressed: () {
+                      context.go(AppRoutes.onboarding);
+                    },
+                  ),
                 ),
               ),
             ],

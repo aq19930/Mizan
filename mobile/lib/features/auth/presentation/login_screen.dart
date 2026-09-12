@@ -1,9 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/mizan_animated_entrance.dart';
 import '../../../shared/widgets/mizan_app_bar.dart';
 import '../../../shared/widgets/mizan_button.dart';
 import '../../../shared/widgets/mizan_password_field.dart';
@@ -63,6 +65,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: MizanAnimatedEntrance(
+                    duration: const Duration(milliseconds: 650),
+                    child: Container(
+                      width: 78,
+                      height: 78,
+                      margin: const EdgeInsets.only(bottom: 22),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDeepGreen.withValues(alpha: 0.18),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          AppConstants.appIcon,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Text(
                   l10n.welcomeBack,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(

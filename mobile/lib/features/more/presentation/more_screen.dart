@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile/l10n/app_localizations.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/notifications/notification_provider.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -300,6 +301,51 @@ class MoreScreen extends ConsumerWidget {
                   title: l10n.logout,
                   titleColor: AppColors.dangerRed,
                   onTap: confirmLogout,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Official Mizan Brand Footer
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryDeepGreen.withValues(alpha: 0.15),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(AppConstants.appIcon, fit: BoxFit.contain),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'ميزان • MIZAN',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'وازن صرفك. خطط لبكرا.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 32),
