@@ -5,9 +5,13 @@ ARG DOTNET_VERSION=10.0
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS base
 WORKDIR /app
 EXPOSE 8080
-ENV PORT=8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+EXPOSE 10000
 ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Install Kerberos GSSAPI library for Npgsql/PostgreSQL and SSL certs
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends libgssapi-krb5-2 ca-certificates && rm -rf /var/lib/apt/lists/*
+USER $APP_UID
 
 # 2. Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS build

@@ -25,8 +25,16 @@ using Mizan.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cloud Run port binding (PORT env variable defaults to 8080)
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+// Dynamic Port binding for Cloud Run (8080) and Render (10000)
+var portStr = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+if (!int.TryParse(portStr, out var port))
+{
+    port = 8080;
+}
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(port);
+});
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 // Forwarded Headers for Cloud Run SSL termination
@@ -199,56 +207,65 @@ if (isMigrationRun)
     return;
 }
 
-// Safe category seeding and schema verification
-using (var scope = app.Services.CreateScope())
+// Safe category seeding and schema verification in background (non-blocking for fast health checks)
+_ = Task.Run(async () =>
 {
-    var db = scope.ServiceProvider.GetRequiredService<MizanDbContext>();
-    var autoMigrate = string.Equals(Environment.GetEnvironmentVariable("AUTO_MIGRATE"), "true", StringComparison.OrdinalIgnoreCase);
-
-    if (db.Database.IsInMemory() || autoMigrate)
+    try
     {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<MizanDbContext>();
+        var autoMigrate = string.Equals(Environment.GetEnvironmentVariable("AUTO_MIGRATE"), "true", StringComparison.OrdinalIgnoreCase);
+
+        if (db.Database.IsInMemory() || autoMigrate)
+        {
+            try
+            {
+                app.Logger.LogInformation("AUTO_MIGRATE active: Ensuring database schema exists...");
+                await db.Database.EnsureCreatedAsync();
+                var creator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+                if (creator != null)
+                {
+                    try { await creator.CreateTablesAsync(); } catch { /* Tables already exist */ }
+                }
+            }
+            catch (Exception ex)
+            {
+                app.Logger.LogWarning(ex, "Database schema check completed with note.");
+            }
+        }
+
         try
         {
-            app.Logger.LogInformation("AUTO_MIGRATE active: Ensuring database schema exists...");
-            db.Database.EnsureCreated();
-            var creator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
-            if (creator != null)
+            if (!await db.Categories.AnyAsync())
             {
-                try { creator.CreateTables(); } catch { /* Tables already exist */ }
+                db.Categories.AddRange(
+                    new Category { Key = "food", NameEn = "Food & Drinks", NameAr = "مطاعم ومشروبات", Icon = "restaurant", ColorHex = "#F59E0B" },
+                    new Category { Key = "groceries", NameEn = "Groceries", NameAr = "بقالة", Icon = "local_grocery_store", ColorHex = "#10B981" },
+                    new Category { Key = "transport", NameEn = "Transportation", NameAr = "مواصلات", Icon = "directions_car", ColorHex = "#6366F1" },
+                    new Category { Key = "shopping", NameEn = "Shopping", NameAr = "تسوق", Icon = "shopping_bag", ColorHex = "#EC4899" },
+                    new Category { Key = "entertainment", NameEn = "Entertainment", NameAr = "ترفيه", Icon = "movie", ColorHex = "#8B5CF6" },
+                    new Category { Key = "bills", NameEn = "Bills", NameAr = "فواتير", Icon = "bolt", ColorHex = "#EAB308" },
+                    new Category { Key = "subscriptions", NameEn = "Subscriptions", NameAr = "اشتراكات", Icon = "subscriptions", ColorHex = "#06B6D4" },
+                    new Category { Key = "health", NameEn = "Health", NameAr = "صحة", Icon = "medical_services", ColorHex = "#EF4444" },
+                    new Category { Key = "travel", NameEn = "Travel", NameAr = "سفر", Icon = "flight", ColorHex = "#3B82F6" },
+                    new Category { Key = "education", NameEn = "Education", NameAr = "تعليم", Icon = "school", ColorHex = "#14B8A6" },
+                    new Category { Key = "housing", NameEn = "Housing", NameAr = "سكن", Icon = "home", ColorHex = "#64748B" },
+                    new Category { Key = "other", NameEn = "Other", NameAr = "أخرى", Icon = "more_horiz", ColorHex = "#6B7280" }
+                );
+                await db.SaveChangesAsync();
+                app.Logger.LogInformation("Categories seeded successfully.");
             }
         }
         catch (Exception ex)
         {
-            app.Logger.LogWarning(ex, "Database schema check completed with note.");
-        }
-    }
-
-    try
-    {
-        if (!db.Categories.Any())
-        {
-            db.Categories.AddRange(
-                new Category { Key = "food", NameEn = "Food & Drinks", NameAr = "مطاعم ومشروبات", Icon = "restaurant", ColorHex = "#F59E0B" },
-                new Category { Key = "groceries", NameEn = "Groceries", NameAr = "بقالة", Icon = "local_grocery_store", ColorHex = "#10B981" },
-                new Category { Key = "transport", NameEn = "Transportation", NameAr = "مواصلات", Icon = "directions_car", ColorHex = "#6366F1" },
-                new Category { Key = "shopping", NameEn = "Shopping", NameAr = "تسوق", Icon = "shopping_bag", ColorHex = "#EC4899" },
-                new Category { Key = "entertainment", NameEn = "Entertainment", NameAr = "ترفيه", Icon = "movie", ColorHex = "#8B5CF6" },
-                new Category { Key = "bills", NameEn = "Bills", NameAr = "فواتير", Icon = "bolt", ColorHex = "#EAB308" },
-                new Category { Key = "subscriptions", NameEn = "Subscriptions", NameAr = "اشتراكات", Icon = "subscriptions", ColorHex = "#06B6D4" },
-                new Category { Key = "health", NameEn = "Health", NameAr = "صحة", Icon = "medical_services", ColorHex = "#EF4444" },
-                new Category { Key = "travel", NameEn = "Travel", NameAr = "سفر", Icon = "flight", ColorHex = "#3B82F6" },
-                new Category { Key = "education", NameEn = "Education", NameAr = "تعليم", Icon = "school", ColorHex = "#14B8A6" },
-                new Category { Key = "housing", NameEn = "Housing", NameAr = "سكن", Icon = "home", ColorHex = "#64748B" },
-                new Category { Key = "other", NameEn = "Other", NameAr = "أخرى", Icon = "more_horiz", ColorHex = "#6B7280" }
-            );
-            db.SaveChanges();
+            app.Logger.LogWarning(ex, "Initial category seeding check completed.");
         }
     }
     catch (Exception ex)
     {
-        app.Logger.LogWarning(ex, "Initial category seeding check completed.");
+        app.Logger.LogWarning(ex, "Background database initialization note: {Message}", ex.Message);
     }
-}
+});
 
 // Global Exception Handler (sanitizes 500 errors, zero secrets/SQL leaks)
 app.UseGlobalExceptionHandler();
